@@ -19,7 +19,7 @@ numbers.forEach(number => {
             bigText.textContent += "  ";
         }
         bigText.textContent += number.id;
-        appendingNumber = true;
+        resetAppendingNumberVariable();
         operatorActive = false;
         appendingNegativeSign = false;
     });
@@ -38,7 +38,7 @@ operations.forEach(operation => {
 
         }
 
-        appendingNumber = false;
+        resetAppendingNumberVariable();
         operatorActive = true;
 
     });
@@ -47,7 +47,7 @@ operations.forEach(operation => {
 clear.addEventListener('click', () => {
     bigText.textContent = "";
     smallText.textContent = "";
-    appendingNumber = false;
+    resetAppendingNumberVariable();
     operatorActive = false;
     appendingNegativeSign = false;
 });
@@ -56,8 +56,10 @@ equals.addEventListener('click', () => {
     bigText.textContent = bigText.textContent.trimStart();
     const bigTextArray = bigText.textContent.split("  ");
     const valuesArray = bigTextArray.map(alterValuesArray);
-    console.table(valuesArray);
 
+    if(!appendingNumber) {
+        valuesArray.pop();
+    }
     while (valuesArray.length > 1) {
        let newValue = operate(valuesArray[0], valuesArray[1], valuesArray[2]);
        valuesArray.shift();
@@ -67,7 +69,7 @@ equals.addEventListener('click', () => {
 
     smallText.textContent = bigText.textContent;
     bigText.textContent = valuesArray[0];
-    appendingNumber = true;
+    resetAppendingNumberVariable();
     appendingNegativeSign = false;
 
 });
@@ -167,10 +169,9 @@ function changeNegativeStringsToNums(textValue){
 function checkIfAbleToAddDecimalPoint() {
     let activeNumbers = bigText.textContent.split("  ");
     let finalNumber = "" + activeNumbers[activeNumbers.length -1];
-    console.log(finalNumber);
     if(!appendingNumber) {
         bigText.textContent += "  0";
-        appendingNumber = true;
+        resetAppendingNumberVariable();
         return true;
     } else if (bigText.textContent === ""){
         return false;

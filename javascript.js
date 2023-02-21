@@ -13,46 +13,69 @@ let operatorActive = false;
 
 numbers.forEach(number => {
     number.addEventListener('click', ()=> {
-        if(appendingNegativeSign){
-            // bigText.textContent += "";
-        } else if(!appendingNumber){
-            bigText.textContent += "  ";
-        }
-        bigText.textContent += number.id;
-        resetAppendingNumberVariable();
-        operatorActive = false;
-        appendingNegativeSign = false;
+        selectNumber(number.id);
     });
+});
+
+document.addEventListener('keydown', event => {
+    // selectNumber(event.key);
+    if(0 <= event.key & event.key <= 9) {
+        selectNumber(event.key);
+    } else if (event.key === "Backspace"){
+        selectBackspace();
+    } else if (event.key === "Enter" | event.key === "=") {
+        selectEquals();
+    } else if (event.key === "Escape" | event.key === "C" | event.key === "c") {
+        selectClear();
+    } else if (event.key === ".") {
+        addDecimalPoint();
+    } else if ("/*-+^".includes(event.key)){
+        selectOperation(event.key);
+    }
 });
 
 operations.forEach(operation => {
     operation.addEventListener('click', ()=> {
-        if(appendingNumber) {
-            bigText.textContent += "  " + operation.textContent;
-        } else if ((operation.id === 'subtract') && !appendingNegativeSign) {
-            if(operatorActive) {
-                bigText.textContent += "  ";
-            }
-            appendingNegativeSign = true;
-            bigText.textContent += operation.textContent;
-
-        }
-
-        resetAppendingNumberVariable();
-        operatorActive = true;
-
+        selectOperation(operation.textContent);
     });
 });
 
 clear.addEventListener('click', () => {
-    bigText.textContent = "";
-    smallText.textContent = "";
-    resetAppendingNumberVariable();
-    operatorActive = false;
-    appendingNegativeSign = false;
+    selectClear();
 });
 
 equals.addEventListener('click', () => {
+    selectEquals();
+});
+
+dot.addEventListener('click', () => {
+    addDecimalPoint();
+});
+
+backspace.addEventListener('click', () => {
+   selectBackspace();
+});
+
+function selectNumber(numberSelected){
+    if(appendingNegativeSign){
+        // bigText.textContent += "";
+    } else if(!appendingNumber){
+        bigText.textContent += "  ";
+    }
+    bigText.textContent += numberSelected;
+    resetAppendingNumberVariable();
+    operatorActive = false;
+    appendingNegativeSign = false;
+}
+
+function selectBackspace(){
+    bigText.textContent = bigText.textContent.trimEnd();
+    bigText.textContent = bigText.textContent.slice(0, -1);
+    bigText.textContent = bigText.textContent.trimEnd();
+    resetAppendingNumberVariable();
+}
+
+function selectEquals(){
     bigText.textContent = bigText.textContent.trimStart();
     const bigTextArray = bigText.textContent.split("  ");
     const valuesArray = bigTextArray.map(alterValuesArray);
@@ -71,22 +94,47 @@ equals.addEventListener('click', () => {
     bigText.textContent = valuesArray[0];
     resetAppendingNumberVariable();
     appendingNegativeSign = false;
+}
 
-});
+function selectClear(){
+    bigText.textContent = "";
+    smallText.textContent = "";
+    resetAppendingNumberVariable();
+    operatorActive = false;
+    appendingNegativeSign = false;
+}
 
-dot.addEventListener('click', () => {
-    if(checkIfAbleToAddDecimalPoint()) {
-        bigText.textContent += ".";
+function selectOperation(operationSelected){
+    switch(operationSelected){
+        case "/": 
+        operationSelected = "÷";
+        break;
+        
+        case "*": 
+        operationSelected = "×";
+        break;
+
+        case "-": 
+        operationSelected = "−";
+        break;
+
+        default:
+            break;
     }
-});
+    if(appendingNumber) {
+        bigText.textContent += "  " + operationSelected;
+    } else if ((operation.id === 'subtract') && !appendingNegativeSign) {
+        if(operatorActive) {
+            bigText.textContent += "  ";
+        }
+        appendingNegativeSign = true;
+        bigText.textContent += operationSelected;
 
-backspace.addEventListener('click', () => {
-    bigText.textContent = bigText.textContent.trimEnd();
-    bigText.textContent = bigText.textContent.slice(0, -1);
-    bigText.textContent = bigText.textContent.trimEnd();
+    }
 
     resetAppendingNumberVariable();
-});
+    operatorActive = true;
+}
 
 function add(num1, num2){
     return +num1 + +num2;
@@ -166,19 +214,24 @@ function changeNegativeStringsToNums(textValue){
     return negativeNumberOutput;
 }
 
-function checkIfAbleToAddDecimalPoint() {
+function addDecimalPoint() {
+    let ableToAddDecimalPoint = false;
     let activeNumbers = bigText.textContent.split("  ");
     let finalNumber = "" + activeNumbers[activeNumbers.length -1];
     if(!appendingNumber) {
         bigText.textContent += "  0";
         resetAppendingNumberVariable();
-        return true;
+        ableToAddDecimalPoint = true;
     } else if (bigText.textContent === ""){
-        return false;
+        ableToAddDecimalPoint = false;
     } else if (finalNumber.includes(".")){
-        return false;
+        ableToAddDecimalPoint = false;
     } else {
-        return true;
+        ableToAddDecimalPoint = true;
+    }
+
+    if(ableToAddDecimalPoint) {
+        bigText.textContent += ".";
     }
 }
 
